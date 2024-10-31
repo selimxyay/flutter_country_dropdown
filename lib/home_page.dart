@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_country_dropdown_app/home_page_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -10,18 +9,20 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with HomePageService {
+class _HomePageState extends State<HomePage> {
   // list that will store all the country data
   List countries = [];
 
   // variable that wil store the country that is selected by the user
   String? selectedCountry;
 
+  late Future<void> countriesFuture;
+
   // the method that fetches the country data will be executed before the home page widget is rendered
   @override
   void initState() {
     super.initState();
-    fetchCountries();
+    countriesFuture = fetchCountries();
   }
 
   // method to fetch the country data
@@ -42,13 +43,14 @@ class _HomePageState extends State<HomePage> with HomePageService {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: fetchCountries(),
+        future: countriesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) const Center(child: CircularProgressIndicator());
           return Center(
             child: SizedBox(
               width: 400,
               child: DropdownButtonFormField<String>(
+                padding: const EdgeInsets.all(5),
                 focusColor: Colors.transparent,
                 value: selectedCountry,
                 decoration: const InputDecoration(labelText: 'Select a country'),
